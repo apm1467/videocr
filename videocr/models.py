@@ -62,12 +62,12 @@ class PredictedSubtitle:
     def __init__(self, frames: List[PredictedFrame]):
         self.frames = [f for f in frames if f.confidence > 0]
 
-    @property
-    def text(self) -> str:
         if self.frames:
             conf_max = max(f.confidence for f in self.frames)
-            return next(f.text for f in self.frames if f.confidence == conf_max)
-        return ''
+            self.text = next(f.text for f in self.frames 
+                                    if f.confidence == conf_max)
+        else:
+            self.text = ''
 
     @property
     def index_start(self) -> int:

@@ -46,11 +46,21 @@ class Video:
         v.release()
 
     def get_subtitles(self) -> str:
+        self._generate_subtitles()
+        return ''.join(
+            '{}\n{} --> {}\n{}\n'.format(
+                i,
+                self._srt_timestamp(sub.index_start),
+                self._srt_timestamp(sub.index_end),
+                sub.text)
+            for i, sub in enumerate(self.pred_subs))
+
+    def _generate_subtitles(self) -> None:
+        self.pred_subs = []
+
         if self.pred_frames is None:
             raise AttributeError(
                 'Please call self.run_ocr() first to generate ocr of frames')
-
-        self.pred_subs = []
 
         # divide ocr of frames into subtitle paragraphs using sliding window
         WIN_BOUND = int(self.fps / 2)  # 1/2 sec sliding window boundary
@@ -75,17 +85,9 @@ class Video:
 
             j += 1
 
+        # also handle the last remaining frames
         if i < self.num_frames - 1:
             self._append_sub(PredictedSubtitle(self.pred_frames[i:]))
-
-        for i, sub in enumerate(self.pred_subs):
-            print('{}\n{} --> {}\n{}\n'.format(
-                i,
-                self._srt_timestamp(sub.index_start),
-                self._srt_timestamp(sub.index_end),
-                sub.text))
-
-        return ''
 
     def _append_sub(self, sub: PredictedSubtitle) -> None:
         if len(sub.text) == 0:
@@ -101,7 +103,7 @@ class Video:
 
     def _srt_timestamp(self, frame_index) -> str:
         time = str(datetime.timedelta(seconds=frame_index / self.fps))
-        return time.replace('.', ',')  # srt uses comma as fractional separator
+        return time.replace('.', ',')  # srt uses comma, not dot
 
 
 time_start = timeit.default_timer()
