@@ -38,18 +38,22 @@ class PredictedFrame:
             # handle line breaks
             if block < block_num:
                 block = block_num
-                self.words.append(PredictedWord(0, '\n'))
+                if self.words and self.words[-1].text != '\n':
+                    self.words.append(PredictedWord(0, '\n'))
 
             if conf >= CONF_THRESHOLD:
                 self.words.append(PredictedWord(conf, text))
 
         self.confidence = sum(word.confidence for word in self.words)
-        self.text = ''.join(word.text + ' ' for word in self.words).strip()
 
-    def is_similar_to(self, other: PredictedFrame, threshold=60) -> bool:
-        if len(self.text) == 0 or len(other.text) == 0:
-            return False
-        return fuzz.ratio(self.text, other.text) >= threshold
+        self.text = ' '.join(word.text for word in self.words)
+        # remove chars that are obviously ocr errors
+        translate_table = {ord(c): None for c in '<>{};`@#$%^*_=\\'}
+        translate_table[ord('|')] = 'I'
+        self.text = self.text.translate(translate_table).strip()
+
+    def is_similar_to(self, other: PredictedFrame, threshold=70) -> bool:
+        return fuzz.partial_ratio(self.text, other.text) >= threshold
 
 
 class PredictedSubtitle:
@@ -76,3 +80,9 @@ class PredictedSubtitle:
         if self.frames:
             return self.frames[-1].index
         return 0
+
+    def is_similar_to(self, other: PredictedSubtitle, threshold=70) -> bool:
+        return fuzz.partial_ratio(self.text, other.text) >= threshold
+
+    def __repr__(self):
+        return '{} - {}. {}'.format(self.index_start, self.index_end, self.text)
