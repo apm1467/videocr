@@ -48,7 +48,7 @@ class Video:
     def get_subtitles(self) -> str:
         self._generate_subtitles()
         return ''.join(
-            '{}\n{} --> {}\n{}\n'.format(
+            '{}\n{} --> {}\n{}\n\n'.format(
                 i,
                 self._srt_timestamp(sub.index_start),
                 self._srt_timestamp(sub.index_end),
@@ -60,10 +60,10 @@ class Video:
 
         if self.pred_frames is None:
             raise AttributeError(
-                'Please call self.run_ocr() first to generate ocr of frames')
+                'Please call self.run_ocr() first to perform ocr on frames')
 
         # divide ocr of frames into subtitle paragraphs using sliding window
-        WIN_BOUND = int(self.fps / 2)  # 1/2 sec sliding window boundary
+        WIN_BOUND = int(self.fps // 2)  # 1/2 sec sliding window boundary
         bound = WIN_BOUND
         i = 0
         j = 1
@@ -95,15 +95,22 @@ class Video:
 
         # merge new sub to the last subs if they are similar
         while self.pred_subs and sub.is_similar_to(self.pred_subs[-1]):
-            lsub = self.pred_subs[-1]
+            ls = self.pred_subs[-1]
             del self.pred_subs[-1]
-            sub = PredictedSubtitle(lsub.frames + sub.frames)
+            sub = PredictedSubtitle(ls.frames + sub.frames)
 
         self.pred_subs.append(sub)
 
-    def _srt_timestamp(self, frame_index) -> str:
-        time = str(datetime.timedelta(seconds=frame_index / self.fps))
-        return time.replace('.', ',')  # srt uses comma, not dot
+    def _srt_timestamp(self, frame_index: int) -> str:
+        td = datetime.timedelta(seconds=frame_index / self.fps)
+        ms = td.microseconds // 1000
+        m, s = divmod(td.seconds, 60)
+        h, m = divmod(m, 60)
+        return '{:02d}:{:02d}:{:02d},{:03d}'.format(h, m, s, ms)
+
+    def save_subtitles_to_file(self, path='subtitle.srt') -> None:
+        with open(path, 'w+') as f:
+            f.write(self.get_subtitles())
 
 
 time_start = timeit.default_timer()
@@ -113,6 +120,6 @@ time_stop = timeit.default_timer()
 print('time for ocr: ', time_stop - time_start)
 
 time_start = timeit.default_timer()
-v.get_subtitles()
+v.save_subtitles_to_file()
 time_stop = timeit.default_timer()
-print('time for get sub: ', time_stop - time_start)
+print('time for save sub: ', time_stop - time_start)
