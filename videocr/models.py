@@ -48,12 +48,12 @@ class PredictedFrame:
 
         self.text = ' '.join(word.text for word in self.words)
         # remove chars that are obviously ocr errors
-        translate_table = {ord(c): None for c in '<>{};`@#$%^*_=\\'}
+        translate_table = {ord(c): None for c in '<>{}[];`@#$%^*_=~\\'}
         translate_table[ord('|')] = 'I'
         self.text = self.text.translate(translate_table).strip()
 
     def is_similar_to(self, other: PredictedFrame, threshold=70) -> bool:
-        return fuzz.partial_ratio(self.text, other.text) >= threshold
+        return fuzz.ratio(self.text, other.text) >= threshold
 
 
 class PredictedSubtitle:
@@ -81,7 +81,7 @@ class PredictedSubtitle:
             return self.frames[-1].index
         return 0
 
-    def is_similar_to(self, other: PredictedSubtitle, threshold=70) -> bool:
+    def is_similar_to(self, other: PredictedSubtitle, threshold=90) -> bool:
         return fuzz.partial_ratio(self.text, other.text) >= threshold
 
     def __repr__(self):
