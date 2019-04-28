@@ -4,10 +4,6 @@ from dataclasses import dataclass
 from fuzzywuzzy import fuzz
 
 
-CONF_THRESHOLD = 60
-# word predictions with lower confidence will be filtered out
-
-
 @dataclass
 class PredictedWord:
     __slots__ = 'confidence', 'text'
@@ -21,7 +17,7 @@ class PredictedFrame:
     confidence: int  # total confidence of all words
     text: str
 
-    def __init__(self, index, pred_data: str):
+    def __init__(self, index: int, pred_data: str, conf_threshold=70):
         self.index = index
         self.words = []
 
@@ -41,7 +37,8 @@ class PredictedFrame:
                 if self.words and self.words[-1].text != '\n':
                     self.words.append(PredictedWord(0, '\n'))
 
-            if conf >= CONF_THRESHOLD:
+            # word predictions with low confidence will be filtered out
+            if conf >= conf_threshold:
                 self.words.append(PredictedWord(conf, text))
 
         self.confidence = sum(word.confidence for word in self.words)

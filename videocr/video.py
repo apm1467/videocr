@@ -71,7 +71,8 @@ class Video:
         if not self.use_fullframe:
             # only use bottom half of the frame by default
             img = img[img.shape[0] // 2:, :]
-        return pytesseract.image_to_data(img, lang=self.lang)
+        config = r'--tessdata-dir "tessdata"'
+        return pytesseract.image_to_data(img, lang=self.lang, config=config)
 
     def get_subtitles(self) -> str:
         self._generate_subtitles()
