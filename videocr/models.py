@@ -48,9 +48,8 @@ class PredictedFrame:
 
         self.text = ' '.join(word.text for word in self.words)
         # remove chars that are obviously ocr errors
-        translate_table = {ord(c): None for c in '<>{}[];`@#$%^*_=~\\'}
-        translate_table[ord('|')] = 'I'
-        self.text = self.text.translate(translate_table).strip()
+        table = str.maketrans('|', 'I', '<>{}[];`@#$%^*_=~\\')
+        self.text = self.text.translate(table).replace(' \n ', '\n').strip()
 
     def is_similar_to(self, other: PredictedFrame, threshold=70) -> bool:
         return fuzz.ratio(self.text, other.text) >= threshold
@@ -58,14 +57,13 @@ class PredictedFrame:
 
 class PredictedSubtitle:
     frames: List[PredictedFrame]
+    text: str
 
     def __init__(self, frames: List[PredictedFrame]):
         self.frames = [f for f in frames if f.confidence > 0]
 
         if self.frames:
-            conf_max = max(f.confidence for f in self.frames)
-            self.text = next(f.text for f in self.frames 
-                                    if f.confidence == conf_max)
+            self.text = max(self.frames, key=lambda f: f.confidence).text
         else:
             self.text = ''
 

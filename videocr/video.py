@@ -3,7 +3,6 @@ from concurrent import futures
 import datetime
 import pytesseract
 import cv2
-import timeit
 
 from .models import PredictedFrame, PredictedSubtitle
 
@@ -24,19 +23,16 @@ class Video:
         self.fps = v.get(cv2.CAP_PROP_FPS)
         v.release()
 
-    def run_ocr(self, lang: str, use_fullframe=False,
-                time_start='0:00', time_end='') -> None:
+    def run_ocr(self, lang: str, time_start: str, time_end: str,
+                use_fullframe: bool) -> None:
         self.lang = lang
         self.use_fullframe = use_fullframe
 
-        ocr_start = self._frame_index(time_start)
+        ocr_start = self._frame_index(time_start) if time_start else 0
+        ocr_end = self._frame_index(time_end) if time_end else self.num_frames
 
-        if time_end:
-            ocr_end = self._frame_index(time_end)
-            if ocr_end < ocr_start:
-                raise ValueError('time_start is later than time_end')
-        else:
-            ocr_end = self.num_frames
+        if ocr_end < ocr_start:
+            raise ValueError('time_start is later than time_end')
         num_ocr_frames = ocr_end - ocr_start
 
         # get frames from ocr_start to ocr_end
@@ -55,7 +51,7 @@ class Video:
     # convert time str to frame index
     def _frame_index(self, time: str) -> int:
         t = time.split(':')
-        t = list(map(int, t))
+        t = list(map(float, t))
         if len(t) == 3:
             td = datetime.timedelta(hours=t[0], minutes=t[1], seconds=t[2])
         elif len(t) == 2:
@@ -139,19 +135,3 @@ class Video:
         m, s = divmod(td.seconds, 60)
         h, m = divmod(m, 60)
         return '{:02d}:{:02d}:{:02d},{:03d}'.format(h, m, s, ms)
-
-    def save_subtitles_to_file(self, path='subtitle.srt') -> None:
-        with open(path, 'w+') as f:
-            f.write(self.get_subtitles())
-
-
-time_start = timeit.default_timer()
-v = Video('1.mp4', 'HanS')
-v.run_ocr()
-time_stop = timeit.default_timer()
-print('time for ocr: ', time_stop - time_start)
-
-time_start = timeit.default_timer()
-v.save_subtitles_to_file()
-time_stop = timeit.default_timer()
-print('time for save sub: ', time_stop - time_start)
