@@ -67,11 +67,11 @@ videocr.save_subtitles_to_file(
 ```
 Write subtitles to `file_path`. If the file does not exist, it will be created automatically.
 
-## Adjustable Parameters
+### Parameters
 
 - `lang`
 
-  Language of the subtitles in the video. 
+  Language of the subtitles in the video. Besides `eng` for English, all language codes on [this page](https://github.com/tesseract-ocr/tessdata_best/tree/master/script) are supported.
 
 - `time_start` and `time_end`
 
@@ -87,8 +87,8 @@ Write subtitles to `file_path`. If the file does not exist, it will be created a
 
   Similarity threshold for subtitle lines. Neighbouring subtitles with larger [Levenshtein](https://en.wikipedia.org/wiki/Levenshtein_distance) ratios than this threshold will be merged together. The default value is fine for most cases.
 
-  Make it closer to 0 if you get too few subtitle lines, or make it closer to 100 if you get too many duplicated subtitles.
+  Make it closer to 0 if you get too many duplicated subtitle lines, or make it closer to 100  if you get too few subtitle lines.
 
 - `use_fullframe`
 
-  By default, only the bottom half of each frame is used for OCR in order to reduce errors. You can explicitly make the algorithm handle the full frame.
+  By default, only the bottom half of each frame is used for OCR. You can explicitly use the full frame if your subtitles are not within the bottom half of each frame.
