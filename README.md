@@ -2,7 +2,7 @@
 
 Extract hardcoded subtitles from videos using the [Tesseract](https://github.com/tesseract-ocr/tesseract) OCR engine with Python.
 
-Input video with hardcoded subtitles:
+Input a video with hardcoded subtitles:
 
 <p float="left">
   <img width="430" alt="screenshot" src="https://user-images.githubusercontent.com/10210967/56873658-3b76dd00-6a34-11e9-95c6-cd6edc721f58.png">
@@ -12,42 +12,47 @@ Input video with hardcoded subtitles:
 ```python
 import videocr
 
-print(videocr.get_subtitles('video.avi', lang='HanS'))
+print(videocr.get_subtitles('video.avi', lang='chi_sim+eng', sim_threshold=70))
 ```
 
 Output:
 
 ``` 
 0
-00:00:00,000 --> 00:00:02,711
--谢谢 … 你 好 -谢谢
-Thank you...Hi. Thanks.
-
-1
-00:00:02,794 --> 00:00:04,879
-喝 点 什么 ?
+00:00:01,042 --> 00:00:02,877
+喝 点 什么 ? 
 What can I get you?
 
+1
+00:00:03,044 --> 00:00:05,463
+我 不 知道
+Um, I'm not sure.
+
 2
-00:00:05,046  --> 00:00:12,554
+00:00:08,091 --> 00:00:10,635
 休闲 时 光 …
 For relaxing times, make it...
 
 3
-00:00:12,804 --> 00:00:14,723
+00:00:10,677 --> 00:00:12,595
 三 得 利 时 光
 Bartender, Bob Suntory time.
 
 4
-00:00:16,474 --> 00:00:19,144
+00:00:14,472 --> 00:00:17,142
+我 要 一 杯 伏特 加
 Un, I'll have a vodka tonic.
 
 5
-00:00:19,394 --> 00:00:20,687
+00:00:18,059 --> 00:00:19,019
 谢谢
 Laughs Thanks.
 
 ```
+
+## Performance
+
+The OCR process runs in parallel and is CPU intensive. It takes 3 minutes on my dual-core laptop to extract a 20 seconds video. You may want more cores for longer videos.
 
 ## API
 
@@ -71,7 +76,11 @@ Write subtitles to `file_path`. If the file does not exist, it will be created a
 
 - `lang`
 
-  Language of the subtitles in the video. Besides `eng` for English, all language codes on [this page](https://github.com/tesseract-ocr/tessdata_best/tree/master/script) are supported.
+  The language of the subtitles in the video. All language codes on [this page](https://github.com/tesseract-ocr/tesseract/wiki/Data-Files#data-files-for-version-400-november-29-2016) (e.g. `'eng'` for English) and all script names in [this repository](https://github.com/tesseract-ocr/tessdata_fast/tree/master/script) (e.g. `'HanS'` for simplified Chinese) are supported.
+  
+  Note that you can use more than one language. For example, `'hin+eng'` means using Hindi and English together for recognition. More details are available in the [Tesseract documentation](https://github.com/tesseract-ocr/tesseract/wiki/Command-Line-Usage#using-multiple-languages).
+  
+  Language data files will be automatically downloaded to your `$HOME/tessdata` directory when necessary. You can read more about Tesseract language data files on their [wiki page](https://github.com/tesseract-ocr/tesseract/wiki/Data-Files).
 
 - `time_start` and `time_end`
 
@@ -92,3 +101,4 @@ Write subtitles to `file_path`. If the file does not exist, it will be created a
 - `use_fullframe`
 
   By default, only the bottom half of each frame is used for OCR. You can explicitly use the full frame if your subtitles are not within the bottom half of each frame.
+  
