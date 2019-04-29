@@ -7,7 +7,6 @@ verify_ssl = true
 
 [packages]
 pytesseract = "*"
-pillow = "*"
 opencv-python = "*"
 fuzzywuzzy = {extras = ["speedup"],version = "*"}
 
