@@ -29,7 +29,7 @@ class Video:
         v.release()
 
     def run_ocr(self, lang: str, time_start: str, time_end: str,
-                conf_threshold: int, use_fullframe: bool) -> None:
+                conf_threshold:int, use_fullframe: bool) -> None:
         self.lang = lang
         self.use_fullframe = use_fullframe
 
@@ -80,8 +80,8 @@ class Video:
         config = '--tessdata-dir "{}"'.format(constants.TESSDATA_DIR)
         return pytesseract.image_to_data(img, lang=self.lang, config=config)
 
-    def get_subtitles(self) -> str:
-        self._generate_subtitles()
+    def get_subtitles(self, sim_threshold: int) -> str:
+        self._generate_subtitles(sim_threshold)
         return ''.join(
             '{}\n{} --> {}\n{}\n\n'.format(
                 i,
@@ -90,7 +90,7 @@ class Video:
                 sub.text)
             for i, sub in enumerate(self.pred_subs))
 
-    def _generate_subtitles(self) -> None:
+    def _generate_subtitles(self, sim_threshold: int) -> None:
         self.pred_subs = []
 
         if self.pred_frames is None:
@@ -112,8 +112,8 @@ class Video:
             else:
                 # divide subtitle paragraphs
                 para_new = j - WIN_BOUND
-                self._append_sub(
-                    PredictedSubtitle(self.pred_frames[i:para_new]))
+                self._append_sub(PredictedSubtitle(
+                    self.pred_frames[i:para_new], sim_threshold))
                 i = para_new
                 j = i
                 bound = WIN_BOUND
@@ -122,7 +122,8 @@ class Video:
 
         # also handle the last remaining frames
         if i < len(self.pred_frames) - 1:
-            self._append_sub(PredictedSubtitle(self.pred_frames[i:]))
+            self._append_sub(PredictedSubtitle(
+                self.pred_frames[i:], sim_threshold))
 
     def _append_sub(self, sub: PredictedSubtitle) -> None:
         if len(sub.text) == 0:
@@ -132,7 +133,7 @@ class Video:
         while self.pred_subs and sub.is_similar_to(self.pred_subs[-1]):
             ls = self.pred_subs[-1]
             del self.pred_subs[-1]
-            sub = PredictedSubtitle(ls.frames + sub.frames)
+            sub = PredictedSubtitle(ls.frames + sub.frames, sub.sim_threshold)
 
         self.pred_subs.append(sub)
 

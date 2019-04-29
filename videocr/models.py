@@ -54,10 +54,12 @@ class PredictedFrame:
 
 class PredictedSubtitle:
     frames: List[PredictedFrame]
+    sim_threshold: int
     text: str
 
-    def __init__(self, frames: List[PredictedFrame]):
+    def __init__(self, frames: List[PredictedFrame], sim_threshold: int):
         self.frames = [f for f in frames if f.confidence > 0]
+        self.sim_threshold = sim_threshold
 
         if self.frames:
             self.text = max(self.frames, key=lambda f: f.confidence).text
@@ -76,8 +78,8 @@ class PredictedSubtitle:
             return self.frames[-1].index
         return 0
 
-    def is_similar_to(self, other: PredictedSubtitle, threshold=90) -> bool:
-        return fuzz.partial_ratio(self.text, other.text) >= threshold
+    def is_similar_to(self, other: PredictedSubtitle) -> bool:
+        return fuzz.partial_ratio(self.text, other.text) >= self.sim_threshold
 
     def __repr__(self):
         return '{} - {}. {}'.format(self.index_start, self.index_end, self.text)
