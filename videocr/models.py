@@ -17,7 +17,7 @@ class PredictedFrame:
     confidence: int  # total confidence of all words
     text: str
 
-    def __init__(self, index: int, pred_data: str, conf_threshold=70):
+    def __init__(self, index: int, pred_data: str, conf_threshold: int):
         self.index = index
         self.words = []
 

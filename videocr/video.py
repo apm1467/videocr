@@ -14,18 +14,22 @@ class Video:
     use_fullframe: bool
     num_frames: int
     fps: float
+    height: int
     pred_frames: List[PredictedFrame]
     pred_subs: List[PredictedSubtitle]
 
     def __init__(self, path: str):
         self.path = path
         v = cv2.VideoCapture(path)
+        if not v.isOpened():
+            raise IOError('can not open video format {}'.format(path))
         self.num_frames = int(v.get(cv2.CAP_PROP_FRAME_COUNT))
         self.fps = v.get(cv2.CAP_PROP_FPS)
+        self.height = int(v.get(cv2.CAP_PROP_FRAME_HEIGHT))
         v.release()
 
     def run_ocr(self, lang: str, time_start: str, time_end: str,
-                use_fullframe: bool) -> None:
+                conf_threshold: int, use_fullframe: bool) -> None:
         self.lang = lang
         self.use_fullframe = use_fullframe
 
@@ -44,8 +48,9 @@ class Video:
         # perform ocr to frames in parallel
         with futures.ProcessPoolExecutor() as pool:
             ocr_map = pool.map(self._single_frame_ocr, frames, chunksize=10)
-            self.pred_frames = [PredictedFrame(i + ocr_start, data) 
-                                for i, data in enumerate(ocr_map)]
+            self.pred_frames = [
+                PredictedFrame(i + ocr_start, data, conf_threshold) 
+                for i, data in enumerate(ocr_map)]
 
         v.release()
 
