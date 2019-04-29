@@ -4,6 +4,7 @@ import datetime
 import pytesseract
 import cv2
 
+from . import constants
 from .models import PredictedFrame, PredictedSubtitle
 
 
@@ -70,8 +71,8 @@ class Video:
     def _single_frame_ocr(self, img) -> str:
         if not self.use_fullframe:
             # only use bottom half of the frame by default
-            img = img[img.shape[0] // 2:, :]
-        config = r'--tessdata-dir "tessdata"'
+            img = img[self.height // 2:, :]
+        config = '--tessdata-dir "{}"'.format(constants.TESSDATA_DIR)
         return pytesseract.image_to_data(img, lang=self.lang, config=config)
 
     def get_subtitles(self) -> str:
