@@ -1,16 +1,18 @@
 # videocr
 
-<img width="300" alt="screenshot" src="https://user-images.githubusercontent.com/10210967/56873658-3b76dd00-6a34-11e9-95c6-cd6edc721f58.png">
+Extract hardcoded subtitles from videos using the [Tesseract](https://github.com/tesseract-ocr/tesseract) OCR engine with Python.
 
-<img width="300" alt="screenshot" src="https://user-images.githubusercontent.com/10210967/56873659-3b76dd00-6a34-11e9-97aa-2c3e96fe3a97.png">
+Input video with hardcoded subtitles:
 
-<img width="300" alt="screenshot" src="https://user-images.githubusercontent.com/10210967/56873660-3b76dd00-6a34-11e9-90dc-20cd9613ebb1.png">
+<p float="left">
+  <img width="430" alt="screenshot" src="https://user-images.githubusercontent.com/10210967/56873658-3b76dd00-6a34-11e9-95c6-cd6edc721f58.png">
+  <img width="430" alt="screenshot" src="https://user-images.githubusercontent.com/10210967/56873659-3b76dd00-6a34-11e9-97aa-2c3e96fe3a97.png">
+</p>
 
-```
+```python
 import videocr
 
 print(videocr.get_subtitles('video.avi', lang='HanS'))
-
 ```
 
 Output:
@@ -46,3 +48,47 @@ Un, I'll have a vodka tonic.
 Laughs Thanks.
 
 ```
+
+## API
+
+```python
+videocr.get_subtitles(
+        video_path: str, lang='eng', time_start='0:00', time_end='',
+        conf_threshold=65, sim_threshold=90, use_fullframe=False)
+```
+Return the subtitles string in SRT format.
+
+
+```python
+
+videocr.save_subtitles_to_file(
+        video_path: str, file_path='subtitle.srt', lang='eng', time_start='0:00',
+        time_end='', conf_threshold=65, sim_threshold=90, use_fullframe=False)
+```
+Write subtitles to `file_path`. If the file does not exist, it will be created automatically.
+
+## Adjustable Parameters
+
+- `lang`
+
+  Language of the subtitles in the video. 
+
+- `time_start` and `time_end`
+
+  Extract subtitles from only a part of the video. The subtitle timestamps are still calculated according to the full video length.
+
+- `conf_threshold`
+
+  Confidence threshold for word predictions. Words with lower confidence than this threshold are discarded. The default value is fine for most cases. 
+
+  Make it closer to 0 if you get too few words from the predictions, or make it closer to 100 if you get too many excess words.
+
+- `sim_threshold`
+
+  Similarity threshold for subtitle lines. Neighbouring subtitles with larger [Levenshtein](https://en.wikipedia.org/wiki/Levenshtein_distance) ratios than this threshold will be merged together. The default value is fine for most cases.
+
+  Make it closer to 0 if you get too few subtitle lines, or make it closer to 100 if you get too many duplicated subtitles.
+
+- `use_fullframe`
+
+  By default, only the bottom half of each frame is used for OCR in order to reduce errors. You can explicitly make the algorithm handle the full frame.
