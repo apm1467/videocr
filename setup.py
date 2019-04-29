@@ -1,11 +1,16 @@
-from distutils.core import setup
+from setuptools import setup
+
+with open('README.md', 'r', encoding='utf-8') as f:
+    readme = f.read()
 
 setup(
     name = 'videocr',
     packages = ['videocr'],
-    version = '0.1.1',
+    version = '0.1.4',
     license = 'MIT',
     description = 'Extract hardcoded subtitles from videos using machine learning',
+    long_description_content_type = 'text/markdown',
+    long_description = readme,
     author = 'Yi Ge',
     author_email = 'me@yige.ch',
     url = 'https://github.com/apm1467/videocr',
