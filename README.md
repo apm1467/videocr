@@ -1,6 +1,6 @@
 # videocr
 
-Extract hardcoded subtitles from videos using the [Tesseract](https://github.com/tesseract-ocr/tesseract) OCR engine with Python.
+Extract hardcoded (burned-in) subtitles from videos using the [Tesseract](https://github.com/tesseract-ocr/tesseract) OCR engine with Python.
 
 Input a video with hardcoded subtitles:
 
@@ -10,10 +10,15 @@ Input a video with hardcoded subtitles:
 </p>
 
 ```python
+# print_sub.py
+
 import videocr
 
-print(videocr.get_subtitles('video.avi', lang='chi_sim+eng', sim_threshold=70))
+if __name__ == '__main__':
+    print(videocr.get_subtitles('video.avi', lang='chi_sim+eng', sim_threshold=70))
 ```
+
+`$ python3 print_sub.py`
 
 Output:
 
@@ -47,7 +52,6 @@ Un, I'll have a vodka tonic.
 00:00:18,059 --> 00:00:19,019
 谢谢
 Laughs Thanks.
-
 ```
 
 ## Performance
@@ -59,7 +63,6 @@ The OCR process runs in parallel and is CPU intensive. It takes 3 minutes on my 
 1. Install [Tesseract](https://github.com/tesseract-ocr/tesseract/wiki) and make sure it is in your `$PATH`
 
 2. `$ pip install videocr`
-
 
 ## API
 
@@ -83,7 +86,7 @@ Write subtitles to `file_path`. If the file does not exist, it will be created a
 
 - `lang`
 
-  The language of the subtitles in the video. All language codes on [this page](https://github.com/tesseract-ocr/tesseract/wiki/Data-Files#data-files-for-version-400-november-29-2016) (e.g. `'eng'` for English) and all script names in [this repository](https://github.com/tesseract-ocr/tessdata_fast/tree/master/script) (e.g. `'HanS'` for simplified Chinese) are supported.
+  The language of the subtitles. You can extract subtitles in almost any language. All language codes on [this page](https://github.com/tesseract-ocr/tesseract/wiki/Data-Files#data-files-for-version-400-november-29-2016) (e.g. `'eng'` for English) and all script names in [this repository](https://github.com/tesseract-ocr/tessdata_fast/tree/master/script) (e.g. `'HanS'` for simplified Chinese) are supported.
   
   Note that you can use more than one language. For example, `'hin+eng'` means using Hindi and English together for recognition. More details are available in the [Tesseract documentation](https://github.com/tesseract-ocr/tesseract/wiki/Command-Line-Usage#using-multiple-languages).
   
@@ -108,4 +111,3 @@ Write subtitles to `file_path`. If the file does not exist, it will be created a
 - `use_fullframe`
 
   By default, only the bottom half of each frame is used for OCR. You can explicitly use the full frame if your subtitles are not within the bottom half of each frame.
-  
