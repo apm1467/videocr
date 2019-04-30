@@ -54,6 +54,13 @@ Laughs Thanks.
 
 The OCR process runs in parallel and is CPU intensive. It takes 3 minutes on my dual-core laptop to extract a 20 seconds video. You may want more cores for longer videos.
 
+## Installation
+
+1. Install [Tesseract](https://github.com/tesseract-ocr/tesseract/wiki) and make sure it is in your `$PATH`
+
+2. `$ pip install videocr`
+
+
 ## API
 
 ```python
