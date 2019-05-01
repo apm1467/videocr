@@ -67,18 +67,18 @@ The OCR process runs in parallel and is CPU intensive. It takes 3 minutes on my 
 ## API
 
 ```python
-videocr.get_subtitles(
-        video_path: str, lang='eng', time_start='0:00', time_end='',
-        conf_threshold=65, sim_threshold=90, use_fullframe=False)
+get_subtitles(
+    video_path: str, lang='eng', time_start='0:00', time_end='',
+    conf_threshold=65, sim_threshold=90, use_fullframe=False)
 ```
 Return the subtitles string in SRT format.
 
 
 ```python
 
-videocr.save_subtitles_to_file(
-        video_path: str, file_path='subtitle.srt', lang='eng', time_start='0:00',
-        time_end='', conf_threshold=65, sim_threshold=90, use_fullframe=False)
+save_subtitles_to_file(
+    video_path: str, file_path='subtitle.srt', lang='eng', time_start='0:00', time_end='',
+    conf_threshold=65, sim_threshold=90, use_fullframe=False)
 ```
 Write subtitles to `file_path`. If the file does not exist, it will be created automatically.
 
