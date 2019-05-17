@@ -1,5 +1,5 @@
 from __future__ import annotations
-from concurrent import futures
+from multiprocessing import Pool
 import datetime
 import pytesseract
 import cv2
@@ -46,11 +46,11 @@ class Video:
         frames = (v.read()[1] for _ in range(num_ocr_frames))
 
         # perform ocr to frames in parallel
-        with futures.ProcessPoolExecutor() as pool:
-            ocr_map = pool.map(self._single_frame_ocr, frames, chunksize=10)
+        with Pool() as pool:
+            it_ocr = pool.imap(self._single_frame_ocr, frames, chunksize=10)
             self.pred_frames = [
                 PredictedFrame(i + ocr_start, data, conf_threshold) 
-                for i, data in enumerate(ocr_map)]
+                for i, data in enumerate(it_ocr)]
 
         v.release()
 
