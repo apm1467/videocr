@@ -15,7 +15,8 @@ Input a video with hardcoded subtitles:
 import videocr
 
 if __name__ == '__main__':
-    print(videocr.get_subtitles('video.avi', lang='chi_sim+eng', sim_threshold=70))
+    print(videocr.get_subtitles('video.mp4', lang='chi_sim+eng',
+                                sim_threshold=70, conf_threshold=65))
 ```
 
 `$ python3 print_sub.py`
@@ -56,7 +57,7 @@ Laughs Thanks.
 
 ## Performance
 
-The OCR process runs in parallel and is CPU intensive. It takes 3 minutes on my dual-core laptop to extract a 20 seconds video. You may want more cores for longer videos.
+The OCR process is CPU intensive. It takes 3 minutes on my dual-core laptop to extract a 20 seconds video. More CPU cores will make it faster.
 
 ## Installation
 
@@ -64,7 +65,7 @@ The OCR process runs in parallel and is CPU intensive. It takes 3 minutes on my 
 
 2. `$ pip install videocr`
 
-## API
+## Functions
 
 ```python
 get_subtitles(
@@ -88,25 +89,25 @@ Write subtitles to `file_path`. If the file does not exist, it will be created a
 
   The language of the subtitles. You can extract subtitles in almost any language. All language codes on [this page](https://github.com/tesseract-ocr/tesseract/wiki/Data-Files#data-files-for-version-400-november-29-2016) (e.g. `'eng'` for English) and all script names in [this repository](https://github.com/tesseract-ocr/tessdata_fast/tree/master/script) (e.g. `'HanS'` for simplified Chinese) are supported.
   
-  Note that you can use more than one language. For example, `'hin+eng'` means using Hindi and English together for recognition. More details are available in the [Tesseract documentation](https://github.com/tesseract-ocr/tesseract/wiki/Command-Line-Usage#using-multiple-languages).
+  Note that you can use more than one language, e.g. `lang='hin+eng'` for Hindi and English together. 
   
-  Language data files will be automatically downloaded to your `$HOME/tessdata` directory when necessary. You can read more about Tesseract language data files on their [wiki page](https://github.com/tesseract-ocr/tesseract/wiki/Data-Files).
-
-- `time_start` and `time_end`
-
-  Extract subtitles from only a part of the video. The subtitle timestamps are still calculated according to the full video length.
+  Language files will be automatically downloaded to your `~/tessdata`. You can read more about Tesseract language data files on their [wiki page](https://github.com/tesseract-ocr/tesseract/wiki/Data-Files).
 
 - `conf_threshold`
 
-  Confidence threshold for word predictions. Words with lower confidence than this threshold are discarded. The default value is fine for most cases. 
+  Confidence threshold for word predictions. Words with lower confidence than this value will be discarded. The default value `65` is fine for most cases. 
 
-  Make it closer to 0 if you get too few words from the predictions, or make it closer to 100 if you get too many excess words.
+  Make it closer to 0 if you get too few words in each line, or make it closer to 100 if there are too many excess words in each line.
 
 - `sim_threshold`
 
-  Similarity threshold for subtitle lines. Neighbouring subtitles with larger [Levenshtein](https://en.wikipedia.org/wiki/Levenshtein_distance) ratios than this threshold will be merged together. The default value is fine for most cases.
+  Similarity threshold for subtitle lines. Subtitle lines with larger [Levenshtein](https://en.wikipedia.org/wiki/Levenshtein_distance) ratios than this threshold will be merged together. The default value `90` is fine for most cases.
 
-  Make it closer to 0 if you get too many duplicated subtitle lines, or make it closer to 100  if you get too few subtitle lines.
+  Make it closer to 0 if you get too many duplicated subtitle lines, or make it closer to 100 if you get too few subtitle lines.
+
+- `time_start` and `time_end`
+
+  Extract subtitles from only a clip of the video. The subtitle timestamps are still calculated according to the full video length.
 
 - `use_fullframe`
 
