@@ -6,7 +6,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
 setup(
     name='videocr',
     packages=['videocr'],
-    version='0.1.5',
+    version='0.1.6',
     license='MIT',
     description='Extract hardcoded subtitles from videos using machine learning',
     long_description_content_type='text/markdown',
@@ -14,7 +14,7 @@ setup(
     author='Yi Ge',
     author_email='me@yige.ch',
     url='https://github.com/apm1467/videocr',
-    download_url='https://github.com/apm1467/videocr/archive/v0.1.5.tar.gz',
+    download_url='https://github.com/apm1467/videocr/archive/v0.1.6.tar.gz',
     install_requires=[
         'fuzzywuzzy>=0.17',
         'python-Levenshtein>=0.12',
