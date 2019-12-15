@@ -10,16 +10,15 @@ Input a video with hardcoded subtitles:
 </p>
 
 ```python
-# print_sub.py
+# example.py
 
-import videocr
+from videocr import get_subtitles
 
-if __name__ == '__main__':
-    print(videocr.get_subtitles('video.mp4', lang='chi_sim+eng',
-                                sim_threshold=70, conf_threshold=65))
+if __name__ == '__main__':  # This check is mandatory for Windows.
+    print(get_subtitles('video.mp4', lang='chi_sim+eng', sim_threshold=70, conf_threshold=65))
 ```
 
-`$ python3 print_sub.py`
+`$ python3 example.py`
 
 Output:
 
@@ -65,23 +64,21 @@ The OCR process is CPU intensive. It takes 3 minutes on my dual-core laptop to e
 
 2. `$ pip install videocr`
 
-## Functions
+## API
 
-```python
-get_subtitles(
-    video_path: str, lang='eng', time_start='0:00', time_end='',
-    conf_threshold=65, sim_threshold=90, use_fullframe=False)
-```
-Return the subtitles string in SRT format.
+1. Return subtitle string in SRT format
+    ```python
+    get_subtitles(
+        video_path: str, lang='eng', time_start='0:00', time_end='',
+        conf_threshold=65, sim_threshold=90, use_fullframe=False)
+    ```
 
-
-```python
-
-save_subtitles_to_file(
-    video_path: str, file_path='subtitle.srt', lang='eng', time_start='0:00', time_end='',
-    conf_threshold=65, sim_threshold=90, use_fullframe=False)
-```
-Write subtitles to `file_path`. If the file does not exist, it will be created automatically.
+2. Write subtitles to `file_path`
+    ```python
+    save_subtitles_to_file(
+        video_path: str, file_path='subtitle.srt', lang='eng', time_start='0:00', time_end='',
+        conf_threshold=65, sim_threshold=90, use_fullframe=False)
+    ```
 
 ### Parameters
 
