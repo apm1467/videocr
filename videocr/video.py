@@ -1,4 +1,6 @@
 from __future__ import annotations
+from typing import List
+import sys
 import multiprocessing
 import pytesseract
 import cv2
@@ -55,7 +57,10 @@ class Video:
             # only use bottom half of the frame by default
             img = img[self.height // 2:, :]
         config = '--tessdata-dir "{}"'.format(constants.TESSDATA_DIR)
-        return pytesseract.image_to_data(img, lang=self.lang, config=config)
+        try:
+            return pytesseract.image_to_data(img, lang=self.lang, config=config)
+        except Exception as e:
+            sys.exit('{}: {}'.format(e.__class__.__name__, e))
 
     def get_subtitles(self, sim_threshold: int) -> str:
         self._generate_subtitles(sim_threshold)
