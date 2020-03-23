@@ -16,8 +16,7 @@ setup(
     url='https://github.com/apm1467/videocr',
     download_url='https://github.com/apm1467/videocr/archive/v0.1.6.tar.gz',
     install_requires=[
-        'fuzzywuzzy>=0.17',
-        'python-Levenshtein>=0.12',
+        'rapidfuzz>=0.2.1',
         'opencv-python>=4.1,<5.0',
         'pytesseract>=0.2.6'
     ],

@@ -8,7 +8,7 @@ verify_ssl = true
 [packages]
 pytesseract = "*"
 opencv-python = "*"
-fuzzywuzzy = {extras = ["speedup"],version = "*"}
+fuzzywuzzy = "*"
 
 [requires]
 python_version = "3.7"
