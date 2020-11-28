@@ -19,7 +19,8 @@ setup(
         'fuzzywuzzy>=0.17',
         'python-Levenshtein>=0.12',
         'opencv-python>=4.1,<5.0',
-        'pytesseract>=0.2.6'
+        'pytesseract>=0.2.6',
+        'p_tqdm'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
