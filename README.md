@@ -60,7 +60,7 @@ The OCR process is CPU intensive. It takes 3 minutes on my dual-core laptop to e
 
 ## Installation
 
-1. Install [Tesseract](https://github.com/tesseract-ocr/tesseract/wiki) and make sure it is in your `$PATH`
+1. Install [Tesseract](https://github.com/tesseract-ocr/tessdoc) and make sure it is in your `$PATH`
 
 2. `$ pip install videocr`
 
