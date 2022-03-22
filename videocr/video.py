@@ -1,9 +1,10 @@
 from __future__ import annotations
+from loguru import logger
 from typing import List
 import sys
-import p_tqdm
-import pytesseract
+from tqdm import tqdm
 import cv2
+import easyocr
 
 from . import constants
 from . import utils
@@ -48,20 +49,14 @@ class Video:
         # get frames from ocr_start to ocr_end
         with Capture(self.path) as v:
             v.set(cv2.CAP_PROP_POS_FRAMES, ocr_start)
-            frames = (v.read()[1] for _ in range(num_ocr_frames))
-
-            # perform ocr to frames in parallel
-            if num_jobs is not None:
-                it_ocr = p_tqdm.p_imap(self._image_to_data,
-                                       range(num_ocr_frames), frames, num_cpus=num_jobs)
-            else:
-                it_ocr = p_tqdm.p_imap(self._image_to_data,
-                                       range(num_ocr_frames), frames)
-
-            self.pred_frames = [
-                PredictedFrame(i + ocr_start, data, conf_threshold)
-                for i, data in enumerate(it_ocr)
-            ]
+            self.reader = easyocr.Reader(['ch_tra', 'en'])
+            self.pred_frames = []
+            for idx in tqdm(range(num_ocr_frames)):
+                frame = v.read()[1]
+                data = self._image_to_data(idx, frame)
+                self.pred_frames.append(
+                    PredictedFrame(idx + ocr_start, data,
+                                   conf_threshold, easyocr=True))
 
     def _image_to_data(self, idx, img) -> str:
         roi_img = img[
@@ -72,7 +67,8 @@ class Video:
         if self.debug:
             cv2.imwrite(f"{idx}.jpg", roi_img)
         try:
-            return pytesseract.image_to_data(roi_img, lang=self.lang, config=config)
+            x = self.reader.readtext(roi_img)
+            return x
         except Exception as e:
             sys.exit('{}: {}'.format(e.__class__.__name__, e))
 

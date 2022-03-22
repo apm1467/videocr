@@ -17,36 +17,45 @@ class PredictedFrame:
     confidence: int  # total confidence of all words
     text: str
 
-    def __init__(self, index: int, pred_data: str, conf_threshold: int):
+    def __init__(self, index: int, pred_data: str, conf_threshold: int, easyocr: bool):
         self.index = index
-        self.words = []
+        if not easyocr:
+            self.words = []
 
-        block = 0  # keep track of line breaks
+            block = 0  # keep track of line breaks
 
-        for l in pred_data.splitlines()[1:]:
-            word_data = l.split()
-            if len(word_data) < 12:
-                # no word is predicted
-                continue
-            _, _, block_num, *_, conf, text = word_data
-            block_num, conf = int(block_num), int(conf)
+            for l in pred_data.splitlines()[1:]:
+                word_data = l.split()
+                if len(word_data) < 12:
+                    # no word is predicted
+                    continue
+                _, _, block_num, *_, conf, text = word_data
+                block_num, conf = int(block_num), int(conf)
 
-            # handle line breaks
-            if block < block_num:
-                block = block_num
-                if self.words and self.words[-1].text != '\n':
-                    self.words.append(PredictedWord(0, '\n'))
+                # handle line breaks
+                if block < block_num:
+                    block = block_num
+                    if self.words and self.words[-1].text != '\n':
+                        self.words.append(PredictedWord(0, '\n'))
 
-            # word predictions with low confidence will be filtered out
-            if conf >= conf_threshold:
-                self.words.append(PredictedWord(conf, text))
+                # word predictions with low confidence will be filtered out
+                if conf >= conf_threshold:
+                    self.words.append(PredictedWord(conf, text))
 
-        self.confidence = sum(word.confidence for word in self.words)
+            self.confidence = sum(word.confidence for word in self.words)
 
-        self.text = ' '.join(word.text for word in self.words)
+            self.text = ' '.join(word.text for word in self.words)
+        else:
+            if len(pred_data) == 0:
+                self.text = ""
+                self.confidence = 0
+            else:
+                self.text = pred_data[0][1]
+                self.confidence = pred_data[0][2]
         # remove chars that are obviously ocr errors
         table = str.maketrans('|', 'I', '<>{}[];`@#$%^*_=~\\')
-        self.text = self.text.translate(table).replace(' \n ', '\n').strip()
+        self.text = self.text.translate(
+            table).replace(' \n ', '\n').strip()
 
     def is_similar_to(self, other: PredictedFrame, threshold=70) -> bool:
         return fuzz.ratio(self.text, other.text) >= threshold

@@ -5,8 +5,6 @@ from .video import Video
 def get_subtitles(
         video_path: str, lang='eng', time_start='0:00', time_end='',
         conf_threshold=65, sim_threshold=90, tesseract_config='', roi=[[0, 1], [0, 1]], debug=False, num_jobs=None) -> str:
-    utils.download_lang_data(lang)
-
     v = Video(video_path)
     v.run_ocr(
         lang, time_start, time_end, conf_threshold,
