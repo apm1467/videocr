@@ -5,6 +5,7 @@ from typing import List
 import cv2
 import easyocr
 import numpy as np
+from tqdm import tqdm
 
 from . import utils
 from .models import PredictedFrame, PredictedSubtitle

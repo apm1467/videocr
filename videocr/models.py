@@ -1,4 +1,5 @@
 from __future__ import annotations
+from loguru import logger
 
 from dataclasses import dataclass
 from typing import List
@@ -53,8 +54,9 @@ class PredictedFrame:
                 self.confidence = 0
             else:
                 self.text = pred_data[0][1]
-                # self.confidence = pred_data[0][2]
-                self.confidence = 0.9
+                self.confidence = pred_data[0][2]*100
+                if self.confidence < conf_threshold:
+                    self.text = ''
         # remove chars that are obviously ocr errors
         table = str.maketrans("|", "I", "<>{}[];`@#$%^*_=~\\")
         self.text = self.text.translate(table).replace(" \n ", "\n").strip()
