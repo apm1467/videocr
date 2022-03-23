@@ -8,7 +8,7 @@ class Capture:
     def __enter__(self):
         self.cap = cv2.VideoCapture(self.path)
         if not self.cap.isOpened():
-            raise IOError('Can not open video {}.'.format(self.path))
+            raise IOError("Can not open video {}.".format(self.path))
         return self.cap
 
     def __exit__(self, exc_type, exc_value, traceback):
