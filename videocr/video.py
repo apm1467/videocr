@@ -1,16 +1,21 @@
 from __future__ import annotations
-
+import os
+from loguru import logger
+from typing import List
 import sys
 from typing import List
 
 import cv2
 import easyocr
-from tqdm import tqdm
+import numpy as np
 
-from . import constants, utils
+from . import constants
+from . import utils
+from .utils import batcher, plot_ocr
 from .models import PredictedFrame, PredictedSubtitle
 from .opencv_adapter import Capture
 
+BATCHSIZE = 32
 
 class Video:
     path: str
@@ -60,26 +65,26 @@ class Video:
             v.set(cv2.CAP_PROP_POS_FRAMES, ocr_start)
             self.reader = easyocr.Reader(["ch_tra", "en"])
             self.pred_frames = []
-            for idx in tqdm(range(num_ocr_frames)):
-                frame = v.read()[1]
-                data = self._image_to_data(idx, frame)
-                self.pred_frames.append(
-                    PredictedFrame(idx + ocr_start, data, conf_threshold, easyocr=True)
-                )
+            for idx in tqdm(batcher(range(num_ocr_frames),
+                                    batch_size=BATCHSIZE), total=num_ocr_frames//BATCHSIZE):
+                frames = [v.read()[1] for _ in range(len(idx))]
+                frames = np.stack(frames)
+                data = self._image_to_data(idx, frames)
+                for _idx, _data in zip(idx, data):
+                    self.pred_frames.append(
+                        PredictedFrame(_idx + ocr_start, _data,
+                                       conf_threshold, easyocr=True))
 
     def _image_to_data(self, idx, img) -> str:
-        roi_img = img[
-            int(self.height * self.roi[1][0]) : int(self.height * self.roi[1][1]),
-            int(self.width * self.roi[0][0]) : int(self.width * self.roi[0][1]),
+        roi_img = img[:,
+            int(self.height*self.roi[1][0]):int(self.height*self.roi[1][1]),
+            int(self.width*self.roi[0][0]):int(self.width*self.roi[0][1])
         ]
-        config = f'{self.tesseract_config} --tessdata-dir "{constants.TESSDATA_DIR}"'
+        result = self.reader.readtext_batched(roi_img, batch_size=BATCHSIZE)
         if self.debug:
-            cv2.imwrite(f"{idx}.jpg", roi_img)
-        try:
-            x = self.reader.readtext(roi_img)
-            return x
-        except Exception as e:
-            sys.exit("{}: {}".format(e.__class__.__name__, e))
+            for _idx, img, _result in zip(idx, roi_img, result):
+                cv2.imwrite(f"{_idx}.jpg", img)
+        return result
 
     def get_subtitles(self, sim_threshold: int) -> str:
         self._generate_subtitles(sim_threshold)

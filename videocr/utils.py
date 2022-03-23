@@ -2,8 +2,16 @@ import datetime
 import shutil
 from urllib.request import urlopen
 
+import numpy as np
+from itertools import islice
+import cv2
 from . import constants
+from loguru import logger
 
+from typing import Tuple
+import numpy as np
+import cv2
+from PIL import Image, ImageDraw, ImageFont
 
 # download language data files to ~/tessdata if necessary
 def download_lang_data(lang: str):
@@ -45,3 +53,8 @@ def get_srt_timestamp(frame_index: int, fps: float):
     m, s = divmod(td.seconds, 60)
     h, m = divmod(m, 60)
     return "{:02d}:{:02d}:{:02d},{:03d}".format(h, m, s, ms)
+
+def batcher(iterable, batch_size):
+    iterator = iter(iterable)
+    while batch := list(islice(iterator, batch_size)):
+        yield batch
