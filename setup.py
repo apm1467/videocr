@@ -22,6 +22,7 @@ setup(
         "pytesseract>=0.2.6",
         "p_tqdm",
         "easyocr@git+https://github.com/flyingmilktea/EasyOCR.git@master",
+        "opencv-python<=4.5.4.60"
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
