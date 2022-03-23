@@ -53,7 +53,7 @@ class PredictedFrame:
                 self.confidence = 0
             else:
                 self.text = pred_data[0][1]
-                #self.confidence = pred_data[0][2]
+                # self.confidence = pred_data[0][2]
                 self.confidence = 0.9
         # remove chars that are obviously ocr errors
         table = str.maketrans("|", "I", "<>{}[];`@#$%^*_=~\\")

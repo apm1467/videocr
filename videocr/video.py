@@ -1,21 +1,18 @@
 from __future__ import annotations
-import os
-from loguru import logger
-from typing import List
-import sys
+
 from typing import List
 
 import cv2
 import easyocr
 import numpy as np
 
-from . import constants
 from . import utils
-from .utils import batcher, plot_ocr
 from .models import PredictedFrame, PredictedSubtitle
 from .opencv_adapter import Capture
+from .utils import batcher, plot_ocr
 
 BATCHSIZE = 32
+
 
 class Video:
     path: str
@@ -65,23 +62,29 @@ class Video:
             v.set(cv2.CAP_PROP_POS_FRAMES, ocr_start)
             self.reader = easyocr.Reader(["ch_tra", "en"])
             self.pred_frames = []
-            for idx in tqdm(batcher(range(num_ocr_frames),
-                                    batch_size=BATCHSIZE), total=num_ocr_frames//BATCHSIZE):
+            for idx in tqdm(
+                batcher(range(num_ocr_frames), batch_size=BATCHSIZE),
+                total=num_ocr_frames // BATCHSIZE,
+            ):
                 frames = [v.read()[1] for _ in range(len(idx))]
                 frames = np.stack(frames)
                 data = self._image_to_data(idx, frames)
                 for _idx, _data in zip(idx, data):
                     self.pred_frames.append(
-                        PredictedFrame(_idx + ocr_start, _data,
-                                       conf_threshold, easyocr=True))
+                        PredictedFrame(
+                            _idx + ocr_start, _data, conf_threshold, easyocr=True
+                        )
+                    )
 
     def _image_to_data(self, idx, img) -> str:
-        roi_img = img[:,
-            int(self.height*self.roi[1][0]):int(self.height*self.roi[1][1]),
-            int(self.width*self.roi[0][0]):int(self.width*self.roi[0][1])
+        roi_img = img[
+            :,
+            int(self.height * self.roi[1][0]) : int(self.height * self.roi[1][1]),
+            int(self.width * self.roi[0][0]) : int(self.width * self.roi[0][1]),
         ]
-        result = self.reader.readtext_batched(roi_img, batch_size=BATCHSIZE,
-                                              paragraph=True)
+        result = self.reader.readtext_batched(
+            roi_img, batch_size=BATCHSIZE, paragraph=True
+        )
         if self.debug:
             for _idx, img, _result in zip(idx, roi_img, result):
                 cv2.imwrite(f"{_idx}.jpg", img)
