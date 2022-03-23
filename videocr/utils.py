@@ -58,3 +58,29 @@ def batcher(iterable, batch_size):
     iterator = iter(iterable)
     while batch := list(islice(iterator, batch_size)):
         yield batch
+
+def cv2_img_add_text(img, text, left_corner: Tuple[int, int],
+                     text_rgb_color=(255, 0, 0), text_size=24, font='SourceHanSansTW-Medium.otf', **option):
+    """
+    USAGE:
+        cv2_img_add_text(img, '中文', (0, 0), text_rgb_color=(0, 255, 0), text_size=12, font='mingliu.ttc')
+    """
+    img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    draw = ImageDraw.Draw(img)
+    font_text = ImageFont.truetype(font=font, size=text_size, encoding=option.get('encoding', 'utf-8'))
+    draw.text(left_corner, text, text_rgb_color, font=font_text)
+    cv2_img = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
+    return cv2_img
+
+def plot_ocr(img, ocr_result):
+    font = cv2.FONT_HERSHEY_COMPLEX
+    for _result in ocr_result:
+        #box, text, conf = _result
+        box, text = _result
+        (x, y, x2, y2) = box[0][0], box[0][1], box[2][0], box[2][1]
+        img = cv2.rectangle(img, (x, y), (x2, y2), (0, 255, 0), 2)
+        #img = cv2.putText(img, text, (x, y2), font, 2,(255,255,255),3)
+        img = cv2_img_add_text(img, text, (x, y2), text_rgb_color=(0, 0, 0),
+                               text_size=32)
+        #img = cv2.putText(img, f'{conf:2.2f}', (x, y2), font, 1, (0,0,0),3)
+    return img

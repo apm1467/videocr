@@ -85,6 +85,10 @@ class Video:
         if self.debug:
             for _idx, img, _result in zip(idx, roi_img, result):
                 cv2.imwrite(f"{_idx}.jpg", img)
+                if len(_result) == 0:
+                    continue
+                ocr_debug_img = plot_ocr(img, _result)
+                out = cv2.imwrite(f"{_idx}_ocr.jpg", ocr_debug_img)
         return result
 
     def get_subtitles(self, sim_threshold: int) -> str:
