@@ -80,7 +80,8 @@ class Video:
             int(self.height*self.roi[1][0]):int(self.height*self.roi[1][1]),
             int(self.width*self.roi[0][0]):int(self.width*self.roi[0][1])
         ]
-        result = self.reader.readtext_batched(roi_img, batch_size=BATCHSIZE)
+        result = self.reader.readtext_batched(roi_img, batch_size=BATCHSIZE,
+                                              paragraph=True)
         if self.debug:
             for _idx, img, _result in zip(idx, roi_img, result):
                 cv2.imwrite(f"{_idx}.jpg", img)
