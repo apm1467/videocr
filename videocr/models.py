@@ -21,6 +21,7 @@ class PredictedFrame:
 
     def __init__(self, index: int, pred_data: str, conf_threshold: int, easyocr: bool):
         self.index = index
+        self.conf_threshold = conf_threshold
         if not easyocr:
             self.words = []
 
@@ -54,8 +55,7 @@ class PredictedFrame:
             else:
                 self.text = pred_data[0][1]
                 self.confidence = pred_data[0][2] * 100
-                if self.confidence < conf_threshold:
-                    self.text = ""
+
         # remove chars that are obviously ocr errors
         table = str.maketrans("|", "I", "<>{}[];`@#$%^*_=~\\")
         self.text = self.text.translate(table).replace(" \n ", "\n").strip()

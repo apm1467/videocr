@@ -130,9 +130,12 @@ class Video:
             else:
                 # divide subtitle paragraphs
                 para_new = j - WIN_BOUND
-                self._append_sub(
-                    PredictedSubtitle(self.pred_frames[i:para_new], sim_threshold)
-                )
+                max_confidence = max([x.confidence for x in self.pred_frames[i:para_new]])
+                mean_conf_threshold = max([x.conf_threshold for x in self.pred_frames[i:para_new]])/(para_new-i)
+                if  max_confidence > mean_conf_threshold:
+                    self._append_sub(
+                        PredictedSubtitle(self.pred_frames[i:para_new], sim_threshold)
+                    )
                 i = para_new
                 j = i
                 bound = WIN_BOUND
@@ -141,11 +144,15 @@ class Video:
 
         # also handle the last remaining frames
         if i < len(self.pred_frames) - 1:
-            self._append_sub(PredictedSubtitle(self.pred_frames[i:], sim_threshold))
+            max_confidence = max([x.confidence for x in self.pred_frames[i:]])
+            mean_conf_threshold = max([x.conf_threshold for x in self.pred_frames[i:]])/(len(self.pred_frames)-i)
+            if  max_confidence > mean_conf_threshold:
+                self._append_sub(PredictedSubtitle(self.pred_frames[i:], sim_threshold))
 
     def _append_sub(self, sub: PredictedSubtitle) -> None:
         if len(sub.text) == 0:
             return
+
 
         # merge new sub to the last subs if they are similar
         while self.pred_subs and sub.is_similar_to(self.pred_subs[-1]):
