@@ -123,7 +123,9 @@ class Video:
         while j < len(self.pred_frames):
             fi, fj = self.pred_frames[i], self.pred_frames[j]
 
-            if fi.is_similar_to(fj):
+            if fi.text == "":
+                i = j
+            elif fi.is_similar_to(fj):
                 bound = WIN_BOUND
             elif bound > 0:
                 bound -= 1
