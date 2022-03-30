@@ -10,6 +10,7 @@ def get_subtitles(
     sim_threshold=90,
     tesseract_config="",
     roi=[[0, 1], [0, 1]],
+    min_txt_size=80,
     debug=False,
     num_jobs=None,
 ) -> str:
@@ -23,6 +24,7 @@ def get_subtitles(
         roi=roi,
         debug=debug,
         num_jobs=num_jobs,
+        min_txt_size=min_txt_size,
     )
     return v.get_subtitles(sim_threshold)
 
@@ -37,6 +39,7 @@ def save_subtitles_to_file(
     sim_threshold=90,
     tesseract_config="",
     roi=[[0, 1], [0, 1]],
+    min_txt_size=80,
     debug=False,
     num_jobs=None,
 ) -> None:
@@ -51,6 +54,7 @@ def save_subtitles_to_file(
         roi=roi,
         debug=debug,
         num_jobs=num_jobs,
+        min_txt_size=min_txt_size,
     )
 
     with open(file_path, "w+", encoding="utf-8") as f:

@@ -40,6 +40,7 @@ class Video:
         conf_threshold: int,
         tesseract_config: str,
         roi=[[0, 1], [0, 1]],
+        min_txt_size=80,
         debug=bool,
         num_jobs=int,
     ) -> None:
@@ -69,7 +70,7 @@ class Video:
             ):
                 frames = [v.read()[1] for _ in range(len(idx))]
                 frames = np.stack(frames)
-                data = self._image_to_data(idx, frames)
+                data = self._image_to_data(idx, frames, min_txt_size)
                 for _idx, _data in zip(idx, data):
                     self.pred_frames.append(
                         PredictedFrame(
@@ -77,14 +78,17 @@ class Video:
                         )
                     )
 
-    def _image_to_data(self, idx, img) -> str:
+    def _image_to_data(self, idx, img, min_txt_size=10) -> str:
         roi_img = img[
             :,
             int(self.height * self.roi[1][0]) : int(self.height * self.roi[1][1]),
             int(self.width * self.roi[0][0]) : int(self.width * self.roi[0][1]),
         ]
         result = self.reader.readtext_batched(
-            roi_img, batch_size=BATCHSIZE, paragraph=True
+            roi_img,
+            batch_size=BATCHSIZE,
+            paragraph=True,
+            min_size=min_txt_size,
         )
         if self.debug:
             for _idx, img, _result in zip(idx, roi_img, result):
