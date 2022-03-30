@@ -41,17 +41,17 @@ def save_subtitles_to_file(
     num_jobs=None,
 ) -> None:
     subs = get_subtitles(
-               video_path,
-               lang,
-               time_start,
-               time_end,
-               conf_threshold,
-               sim_threshold,
-               tesseract_config=tesseract_config,
-               roi=roi,
-               debug=debug,
-               num_jobs=num_jobs,
-           )
+        video_path,
+        lang,
+        time_start,
+        time_end,
+        conf_threshold,
+        sim_threshold,
+        tesseract_config=tesseract_config,
+        roi=roi,
+        debug=debug,
+        num_jobs=num_jobs,
+    )
 
     with open(file_path, "w+", encoding="utf-8") as f:
         f.write(subs)
