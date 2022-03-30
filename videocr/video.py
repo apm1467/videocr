@@ -41,6 +41,8 @@ class Video:
         tesseract_config: str,
         roi=[[0, 1], [0, 1]],
         min_txt_size=80,
+        min_txt_rgb=[240, 240, 240],
+        max_txt_rgb=[255, 255, 255],
         debug=bool,
         num_jobs=int,
     ) -> None:
@@ -68,7 +70,17 @@ class Video:
                 batcher(range(num_ocr_frames), batch_size=BATCHSIZE),
                 total=num_ocr_frames // BATCHSIZE,
             ):
-                frames = [v.read()[1] for _ in range(len(idx))]
+                frames = []
+                for _ in range(len(idx)):
+                    frame = v.read()[1]
+
+                    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    lower = np.array(min_txt_rgb)
+                    upper = np.array(max_txt_rgb)
+                    mask = cv2.inRange(rgb, lower, upper)
+                    frame = cv2.bitwise_and(frame, frame, mask=mask)
+
+                    frames.append(frame)
                 frames = np.stack(frames)
                 data = self._image_to_data(idx, frames, min_txt_size)
                 for _idx, _data in zip(idx, data):
