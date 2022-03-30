@@ -135,7 +135,7 @@ class Video:
                 max_confidence = max(
                     [x.confidence for x in self.pred_frames[i:para_new]]
                 )
-                mean_conf_threshold = max(
+                mean_conf_threshold = sum(
                     [x.conf_threshold for x in self.pred_frames[i:para_new]]
                 ) / (para_new - i)
                 if max_confidence > mean_conf_threshold:
@@ -151,7 +151,7 @@ class Video:
         # also handle the last remaining frames
         if i < len(self.pred_frames) - 1:
             max_confidence = max([x.confidence for x in self.pred_frames[i:]])
-            mean_conf_threshold = max(
+            mean_conf_threshold = sum(
                 [x.conf_threshold for x in self.pred_frames[i:]]
             ) / (len(self.pred_frames) - i)
             if max_confidence > mean_conf_threshold:
