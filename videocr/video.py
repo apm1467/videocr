@@ -101,6 +101,8 @@ class Video:
             batch_size=BATCHSIZE,
             paragraph=True,
             min_size=min_txt_size,
+            y_ths=5,
+            x_ths=5,
         )
         if self.debug:
             for _idx, img, _result in zip(idx, roi_img, result):
