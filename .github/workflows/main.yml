@@ -1,0 +1,37 @@
+# act -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest
+
+name: reformat
+on: [push, workflow_dispatch]
+jobs:
+  reformat:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    # When local act in ghcr.io/catthehacker/ubuntu:act-latest, remove Set up Python Part
+    - name: Set up Python 
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x' # Version range or exact version of a Python version to use, using semvers version range syntax.
+        architecture: 'x64' # (x64 or x86)
+    # When local act in ghcr.io/catthehacker/ubuntu:act-latest, add apt update & apt-get install -y python3-pip
+    - name: Install dependencies
+      run: |
+        python -m pip install black isort yq autoflake
+    - name: autoflake
+      run: autoflake --in-place --expand-star-imports --remove-all-unused-imports --ignore-init-module-imports --recursive .
+    - name: isort
+      run: isort .
+    - name: black
+      run: black .
+    - name: auto-commit
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with: 
+        commit_message: Auto Formatting
+        commit_options: '--no-verify --signoff'
+        commit_user_name: gitHub gctions auto-formatting bot # defaults to "GitHub Actions"
+   
+
+
+
+
